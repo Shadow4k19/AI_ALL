@@ -6,8 +6,14 @@ services:
     build: ./BackEnd/AI_BackEnd_django
     container_name: ai_backend_k
     image: ai_backend_k:dev
+    environment:
+      - DB_NAME=my_database
+      - DB_HOST=localhost
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=1234
     ports:
-      - "7203:8000"
+      - "8000:8000"
 
   # FRONTEND
   frontend:
@@ -15,7 +21,7 @@ services:
     container_name: web_face_recognition_k
     image: web_face_recognition_k:dev
     ports:
-      - "7200:3000"
+      - "3000:3000"
     depends_on:
       - backend_server
 
@@ -25,7 +31,7 @@ services:
     container_name: web_socket_k
     image: web_socket_k:dev
     ports:
-      - "7204:8765"
+      - "8765:8765"
     depends_on:
       - frontend
 
@@ -36,6 +42,8 @@ services:
       - "8080:80"
     environment:
       - PMA_ARBITRARY=1
+    depends_on:
+      - db_k
 
   #db
   db_k:
@@ -43,13 +51,16 @@ services:
     container_name: db_k
     image: sql_k:dev
     environment:
-      MYSQL_ROOT_PASSWORD: ''
-      MYSQL_DATABASE: database
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=my_database
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_HOST=db_k
+      - MYSQL_PORT=3306 
     volumes:
       - aidetect-data-volumes:/usr/local/bin/docker-entrypoint-initdb.d
     ports:
-      - "9906:3306"
+      - "3306:3306"
+    command: "--socket=/var/lib/mysql/mysql.sock"
 
 volumes:
   aidetect-data-volumes:
